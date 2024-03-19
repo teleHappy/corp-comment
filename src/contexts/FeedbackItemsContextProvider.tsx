@@ -1,12 +1,39 @@
-import { createContext, useEffect, useMemo, useState } from "react"
+import { createContext, useContext, useEffect, useMemo, useState } from "react"
 import { TFeedbackItem } from "../lib/types"
 
-const FeedbackItemsContext = createContext(null)
+type TFeedbackItemsContext = {
+  feedbackItems: TFeedbackItem[]
+  isLoading: boolean
+  errorMessage: string
+  companyList: string[]
+  handleAddToList: (text: string) => void
+  filteredFeedbackItems: TFeedbackItem[]
+  handleSelectCompany: (company: string) => void
+}
 
-export default function FeedbackItemsContextProvider() {
+type FeedbackItemsContextProviderProps = {
+  children: React.ReactNode
+}
+
+export const FeedbackItemsContext = createContext<TFeedbackItemsContext | null>(
+  null
+)
+
+export default function FeedbackItemsContextProvider({
+  children,
+}: FeedbackItemsContextProviderProps) {
   const [feedbackItems, setFeedbackItems] = useState<TFeedbackItem[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState("")
+  const [selectedCompany, setSelectedCompany] = useState<string>("")
+
+  const filteredFeedbackItems = useMemo(
+    () =>
+      selectedCompany
+        ? feedbackItems.filter((item) => item.company === selectedCompany)
+        : feedbackItems,
+    [feedbackItems, selectedCompany]
+  )
 
   const companyList = useMemo(
     () =>
@@ -46,6 +73,10 @@ export default function FeedbackItemsContextProvider() {
     )
   }
 
+  const handleSelectCompany = (company: string) => {
+    setSelectedCompany(company)
+  }
+
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true)
@@ -69,14 +100,31 @@ export default function FeedbackItemsContextProvider() {
     fetchData()
   }, [])
 
-  return <FeedbackItemsContext value={
-    {
-      feedbackItems,
-      isLoading,
-      errorMessage,
-      companyList,
-      handleAddToList
-    }
+  return (
+    <FeedbackItemsContext.Provider
+      value={{
+        feedbackItems,
+        isLoading,
+        errorMessage,
+        companyList,
+        handleAddToList,
+        filteredFeedbackItems,
+        handleSelectCompany,
+      }}
+    >
+      {children}
+    </FeedbackItemsContext.Provider>
+  )
+}
+
+export function useFeedbackItemsContext() {
+  const context = useContext(FeedbackItemsContext)
+
+  if (!context) {
+    throw new Error(
+      "useFeedbackItems must be used within a FeedbackItemsContextProvider"
+    )
   }
-  }>FeedbackItemsContextProvider</FeedbackItemsContext>
+
+  return context
 }
