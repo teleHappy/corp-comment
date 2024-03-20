@@ -12,6 +12,6 @@ This is acceptable for simple projects where props are passed down through 1-2 l
 
 This is acceptable for small to mid-sized apps as it organizes state in a more reasonable way via the context file(s). Does not solve the re-render issue above. Context is ultimately a component that wraps around some sections of you application's component tree.
 
-## Zustand
+## Zustand (zustand branch)
 
 State data and methods are consolidated in Zustand stores. Solves the above mentioned re-render issue by providing selectors. Using selectors, components will re-render only when their specific pieces of state data changes.
