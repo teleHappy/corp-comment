@@ -1,15 +1,13 @@
+import { useFeedbackItemsStore } from "../../stores/FeedbackItemsStore"
+
 type HashtagItemProps = {
   company: string
-  onSelectCompany: (company: string) => void
 }
-
-export default function HashtagItem({
-  company,
-  onSelectCompany,
-}: HashtagItemProps) {
+export default function HashtagItem({ company }: HashtagItemProps) {
+  const selectCompany = useFeedbackItemsStore((state) => state.selectCompany)
   return (
     <li>
-      <button onClick={() => onSelectCompany(company)}>#{company}</button>
+      <button onClick={() => selectCompany(company)}>#{company}</button>
     </li>
   )
 }
